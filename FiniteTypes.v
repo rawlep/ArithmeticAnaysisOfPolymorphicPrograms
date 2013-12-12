@@ -9,8 +9,6 @@ Set Implicit Arguments.
 Section FinSum_defs.
 
 Implicit Arguments fz [n ].
-
-Check lt_S_n.
  
 
  Fixpoint fin_inl (n m : nat ) (i : Fin n) {struct i} : Fin (n + m) :=
@@ -614,47 +612,7 @@ Lemma rotn_Sn : forall n m (i : Fin m), rot (rotn n i) = rotn (S n) i.
      destruct i; simpl; trivial.
   Qed.
 
- (*Lemma rotn_emb1 : forall n m (i : Fin (S m)), i <> fz m -> 
-       rotn n (emb i) = .
- Proof.
-   destruct i using FinSn_rect; simpl; auto.
-   intro H; case (H (refl_equal (fz n))).
- Qed. *)
-
-
- (*Lemma rotn_emb : forall n m (i : Fin (S m)), 
-         rotn n (emb i) = emb (rotn n i).
- Proof.
-   induction n; simpl; trivial.
-   intros. simpl.   rewrite <- (IHn m (rot i)).
-   destruct i using FinSn_rect. simpl; trivial.
-   simpl. Check (IHn m (tp m)).
-  
-  *)
  
- (*Lemma rotn_tp_fz : forall n m, 
-     rotn n (tp m) = (fz m) -> rotn n (emb (tp m)) = fz (S m).
- Proof.
-   induction n; simpl. intros. rewrite H; simpl; trivial.
-   intros. apply (IHn  m ). *)
-
-
-(* Lemma rotn_fz : forall n, rotn n (tp n) = fz n.
- Proof.
-   induction n. simpl; trivial.
-   simpl. replace (fz (S n)) with (emb (fz n)); auto.
-   rewrite <- IHn. destruct n; simpl; auto. *)
-
-
-(*Lemma rotn_n : forall n (i : Fin n),   rotn n i = i.
-  Proof.
-    destruct i; simpl.
-    destruct i using FinSn_rect; simpl. destruct i. simpl.
-    pattern i at 2.
-    rewrite <- (IHn i).
-    rewrite (rotn_rot_swap n (fs i)). simpl.
-    destruct m; intros. discriminate H. *)
-
  Definition un_rot (n : nat) :  Fin n -> Fin n := 
    match n as e return Fin e -> Fin e with
    | O => fun i => i
@@ -701,7 +659,6 @@ Lemma rotn_Sn : forall n m (i : Fin m), rot (rotn n i) = rotn (S n) i.
 
 End Rotate. 
 
-(*Require Import Minus. *)
 
 (* Fixpoint eqFin (n :nat) (i  : Fin n): Fin n ->  bool :=
    match i in Fin e return Fin e -> bool with
@@ -1223,38 +1180,7 @@ End JMeq_fin_inl_or_inr.
 
 Section ZipMaps.
 
- (*
- Definition finN0 n  : Fin n -> Fin (n + 0).
-  induction n; simpl.
-  exact (fun i => i).
-  intros.
-  destruct (finSN H).
-  exact (fz _ ).
-  exact (fs (IHn i)).
- Defined.
-
- Definition zipN (m n  : nat) : Fin n -> Fin n +  Fin m.
-    induction m. simpl. exact (fun _ i =>  inl _ i).
-    intros. destruct H.
-    exact (inl _ (fz _ )).
-     destruct H. exact (inr _ (fz _)). 
-     destruct (IHm _ (fs H)).
-    exact (inl _  (fs f)).
-    exact (inr _ (fs f)).
-  Defined.
-
- Definition zipM ( n m  : nat) : Fin m -> Fin n +  Fin m.
-   induction n; simpl.
-   exact (fun _ i => inr _ i).
-   intros. destruct H. 
-   exact (inl _ (tp _ )).
-   destruct (IHn _ H).
-   exact (inl _ (emb f)).
-   exact (inr _ (fs f)).
- Defined.
-
-    
-*)
+ 
  Definition ziP (n m : nat) : Fin (n + m) -> Fin n + Fin m.
     induction n. simpl.
     exact (fun _ i => inr _ i).
