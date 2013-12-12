@@ -89,7 +89,6 @@ Require Import Arith FinSummDefs  Omega JMeq ZArith Ring Containers.
           let H := constr:(minus_plus n m) in rewrite H
     | [H : ?n <= ?m |- context[ ?n + (?m - ?n)]] =>
           let Eq := constr:(le_plus_minus_r _ _ H) in rewrite Eq
-    (*| _   => auto with arith *)
    end.
 
  Ltac minus_simpl := repeat minus_simpls.
@@ -592,35 +591,3 @@ Require Import Arith FinSummDefs  Omega JMeq ZArith Ring Containers.
   Ltac  optimiseOmega := 
        repeat  optimiseOmega_aux; rewrite_right_0 ; minus_simpl; 
                repeat (foo_minus || auto with arith).
-
- (*(* Ltac FSimpl_arith := progress (FSimpl || foo_minus); auto. *)
-  Ltac dest_fn :=
-    match goal with
-    (* | [ n : nat |- _ ] => *)
-      (* match goal with *)
-       | [  |- context[  match  ?X with
-             | fz _ => ?x
-             | fs _ _ => ?y
-             end ] ] => destruct X; simpl
-       (*end *)
-    end.
-
- 
-  Ltac dest_rot T :=
-   match T with
-   | context [ (rot ?x) ] => dest_rot x
-  (* | context [ rot (rot ?x) ] => dest_rot (rot x) *)
-   | _ => match goal with
-          | [n : nat |-  _]  =>
-               match type of T with
-                  | Fin n => destruct T; simpl
-                  | _  => 
-                      match T with
-                      | context [tp n ] => destruct n; simpl; auto
-                      end
-                  end
-          end
-   end. *)
-
-
-
