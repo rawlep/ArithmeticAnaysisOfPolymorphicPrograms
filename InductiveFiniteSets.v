@@ -1,5 +1,4 @@
-
-Require Import  Eqdep_dec Image Peano_dec. 
+Require Import  Eqdep_dec Image Peano_dec Arith.
 
 (** Inductive Finite Types *)
 
@@ -175,11 +174,6 @@ Fixpoint lefin (n : nat) (i  : Fin n) {struct i}: Fin n -> bool :=
 
 Implicit Arguments nat_finite [n].
 
-(*Fixpoint finite_nat (n:nat)(i:Fin n){struct i}: nat :=
-match i with
-  fz _ => 0
-| fs _ i' => S (finite_nat i')
-end. *)
 
 Lemma nat_finite_id:
   forall (n k:nat)(h:k<n), (foo (nat_finite k h)) = k.
@@ -190,7 +184,7 @@ Proof.
  exact (fun h => f_equal S (IHn k (lt_S_n k n h))).
 Qed.
 
- Fixpoint finite_lt_n (n : nat) (i : Fin n) {struct i}: (foo i) < n :=
+ Fixpoint finite_lt_n (n : nat) (i : Fin n) : (foo i) < n :=
    match i as e in Fin m return (foo e) < m with
    | fz x => lt_O_Sn x
    | fs _ j => lt_n_S (foo j) _ (finite_lt_n j)
@@ -214,7 +208,6 @@ Proof.
 Qed.
 
 (* similarity *)
-Require Import Arith.
 
  (* turn (forall n, Fin n -> Fin n) to  N x N -> N *)
  Definition FinFn (H : forall n, Fin n -> Fin n) := 
@@ -270,7 +263,7 @@ Require Import Arith.
    [case (le_not_lt _ _ l H1) | apply (nat_finite_id l)].
   Qed.
 
- (* the conversions preserve equality *)
+ (* the conversions preserves equality *)
  Lemma FinFn_eq_ok : forall (h h1 : forall n, Fin n -> Fin n), h  = h1 -> 
    FinFn h = FinFn h1.
   Proof.
