@@ -288,17 +288,6 @@ Require Import Arith FinSummDefs  Omega JMeq ZArith Ring Containers.
                                                            end
      | [ H : ?a - ?b  < ?a ,   H1 : ?b < ?a  |- _ ] => clear H
     (* no do the same for integers  *)
-    (*  | [ H : (?m < ?n )%Z  |- _ ] => 
-          match m with 
-          |  0%Z  =>  match n with
-                    | (?a - ?b)%Z => 
-                              let h := constr:(minus_gt_0Z _ _ H) in generalize h; clear H; intros
-                   end
-          end
-     (* remove duplicate hypotheses*)
-     |[ H : (?a < ?b)%Z ,  H1 : (?a < ?b)%Z |- _ ] => clear H 
-     |[ H : (?a <= ?b)%Z ,  H1 : (?a <= ?b)%Z |- _ ] => clear H 
-     |[ H : (?a < ?b)%Z ,  H1 : (?b > ?a)%Z |- _ ] => clear H *)
      end.
 
 
@@ -345,11 +334,9 @@ Require Import Arith FinSummDefs  Omega JMeq ZArith Ring Containers.
  Ltac add_hyp_then_tac H tac :=
    match type of H with
    | ?t1 = ?t2 =>
-         (*let H1 := constr:(sym_eq H) in *)
-           add_hyp_then_aux1 H tac (*| add_hyp_then_aux1 H1 tac ] *)
+           add_hyp_then_aux1 H tac 
    | JMeq ?t1 ?t2 =>
-         (*let H1 := constr:(sym_JMeq H) in *)
-            add_hyp_then_aux1 H tac (*| add_hyp_then_aux1 H1 tac ] *)
+            add_hyp_then_aux1 H tac 
   end.
 
 
@@ -440,8 +427,6 @@ Require Import Arith FinSummDefs  Omega JMeq ZArith Ring Containers.
              let Eq := constr:(FinCase_inl x i) in rewrite Eq 
     | [ |- context [FinCase ?x _ (fin_inr  ?x ?i)] ] =>   
              let Eq := constr:(FinCase_inr x i) in rewrite Eq 
-   (*| [ |- context [FinCase (S ?n) ?m (fs ?a) ] ] => 
-             let H := constr:(fincaseS _ _ a) *)
     | [ |- context [FinCase _ ] ] =>
            first  [ (match goal with
                    | [ |- context [sum_n _ ]] => fail 1
