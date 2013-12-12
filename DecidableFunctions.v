@@ -1,4 +1,3 @@
-
 Require Import FiniteTypes Arith MyTactics MPiecewise  VNArith.  
 
 
@@ -64,20 +63,6 @@ Require Import FiniteTypes Arith MyTactics MPiecewise  VNArith.
     | adD l r => adD (plsn l v) (plsn r v)
     | suB l r => suB (plsn l v) (plsn r v)
    end. 
-
-  (* this belongs to the vectors file *
-  Lemma vecfin_emb (A : Set) n (i : Fin n) (v : Vec A (S n)) : vecfin v (emb i) = vecfin (vfirst v) i.
-    induction i; intros; vSimp; simpl. unfold vhead; simpl; trivial.
-     generalize (IHi (vcons a0 i0)); simpl. intro h; rewrite h.
-    unfold vfirst; unfold vhead; unfold vtail; simpl; trivial.
-  Qed.
-
-  Lemma vecfin_tp (A : Set) n  (v : Vec A (S n)) : vecfin v (tp n) =  vlast v.
-  Proof.
-    induction n; intros ; vSimp.  unfold vlast.  unfold vhead; unfold vtail; simpl; trivial.
-    generalize (IHn (vcons a0 i)); simpl. intro h; rewrite h.
-   unfold vlast; unfold vhead; unfold vtail; simpl; trivial.
-  Qed. *)
  
   (** check we did the correct thing with  *)
   Lemma plsn_ok n (a : lfun (S n)) : 
@@ -160,19 +145,6 @@ Require Import FiniteTypes Arith MyTactics MPiecewise  VNArith.
      generalize (IHn (vcons a0 i)); simpl. intro h; rewrite h.
      unfold vlast; unfold vhead; unfold vtail; auto.
   Qed.
-
-
-   
-
- (* good! Now we can turn functions into integers for equality * )
-  Fixpoint lfun2Lf n (i : lfun  n) : Lfun n :=
-    match i in lfun _ return Lfun _ with 
-    | cnst a => con _ (Z_of_nat a)
-    | vr j =>  var j
-    | adD l r => add (lfun2Lf l) (lfun2Lf r)
-    | suB l r  => sub (lfun2Lf l) (lfun2Lf r)
-   (* | nmul n l => nmul n (plsn l v) *)
-   end. *)
 
  
  Section TLPiecewise.
@@ -346,63 +318,6 @@ Require Import FiniteTypes Arith MyTactics MPiecewise  VNArith.
 
  End Composition.
   
-  (*
-
-   Z_le_dec
-     : forall x y : Z, {(x <= y)%Z} + {~ (x <= y)%Z}
- 
-   le_lt_dec
-     : forall n m : nat, {n <= m} + {m < n}
-
-    Section Composition.
- 
-
-  
- 
-
-  (* --------------------------------------------------*) 
-    Fixpoint pcmp2Sn' n (l : PLfun 2) (i : Lfun  n)  :=
-    match l with
-    | lp ll => lp (cmp2Sn ll i)
-    | pf c ll rr => pf (pcmp2Sn' c i) (pcmp2Sn' ll i) (pcmp2Sn' rr i)
-    end.
-
-   Lemma pcmp2Sn'_ok n (l :  PLfun 2) (ln :  Lfun n) : forall vz,
-      peval (pcmp2Sn' l ln) vz =  peval l (vcons (eval ln (vfirst vz)) (vcons (vlast vz) (vnil _))).
-   Proof.
-     induction l; simpl; try apply cmp2Sn_ok.
-     intros ln vz; rewrite (IHl1 ln vz);  rewrite (IHl2 ln vz); rewrite (IHl3 ln vz); trivial.
-   Qed.
- (* ------------------------------------------------- *)
- 
-  
-  End  Composition.
- 
-(* --------------------------------------------------------------------------------------*)
-
-  (* normalizing is easy  *)
-  Fixpoint pnorm n (i : PLfun n) : Piecewise (LPN n) :=
-     match i with
-     | lp l => lp (norm l)
-     | pf a b c => pf (pnorm a) (pnorm b) (pnorm c)
-     end.
-
-  (* and so is unnrm *)
-  Fixpoint p_un_nrm n (i : Piecewise (LPN n)) : PLfun n :=
-    match i with
-    | lp l => lp (un_nrm (fst l) (snd l))
-    | pf c l r => pf (p_un_nrm c) (p_un_nrm l) (p_un_nrm r)
-    end.
-
-
-  Lemma pnorm_un_norm n (i : PLfun n) : forall v, peval i v = peval (p_un_nrm (pnorm i)) v. 
-  Proof.
-    induction i; simpl. apply norm_un_nrm.
-    intros v; rewrite (IHi1 v); rewrite (IHi2 v); rewrite (IHi3 v); trivial.
-  Qed.
-
-  *)
-  
 
  Section Representation.
   
@@ -435,20 +350,6 @@ Require Import FiniteTypes Arith MyTactics MPiecewise  VNArith.
      | vcons _ x xs =>  if le_lt_dec (fst x ) i then  nf2pvf1 xs  (snd x) (i - (fst x)) else (snd x) i
      end.
 
-    (* unpacking  list of lists -- experimentsl verision  *-)
-   Fixpoint vp2pv n (X : Set) (v : Vec (nat * (nat -> X)) n) m (F : nat -> X) := 
-      match v with 
-      | vnil => fun i => F i 
-      | vcons _ x xs => fun i => if le_lt_dec m i then 
-                         vp2pv xs (fst x) F (i - m) 
-              else (snd x) i 
-      end. 
-
-   Definition vpair2pv n (X: Set) (v : Vec (nat * (nat -> X)) (S n)) := 
-        (vmap (fst (A := nat) (B := nat -> X)) v, vp2pv (vtail v) (fst (vhead v)) (snd (vhead v))).
-
-    *)
-
   (*
     Fixpoint  vf2pvf1 n (X : Set) (v : Vec (Z * (Z -> X)) n) (k : Z * (Z -> X)) (z : Z) :   X :=
      match v with
@@ -468,14 +369,7 @@ Require Import FiniteTypes Arith MyTactics MPiecewise  VNArith.
    (* piecewise *)
     Definition PPCm_int n (X : Set) :   PPCm  n -> Vec (nat * (nat -> X)) (S n) ->   nat * (nat -> X) := 
         fun i nm => PPCm_int' i (nf2pf nm).              
-   
-    (*
-       Definition pcmSm n (X : Set) (i : PCM n) : Vec Z (S n) * (Z -> X) ->   Z * (Z -> X) :=
-      fun nm =>  let (l , p) := i in
-               (LPNevl l (fst nm) , fun v => snd nm (clpInt  p (vSnoc v (fst nm))) ).
-      Definition pcmIntt n (X : Set) (i : PCM n) : Vec (prod Z (Z -> X)) (S n) ->  prod Z (Z -> X) :=
-    fun nm => pcmSm i (vf2pvf nm).
-      *) 
+
 
  (** Composition : we only postcompose with a univariete functions *)
     Definition PComp n (l : PCm 0) (r : PCm n) := 
@@ -503,15 +397,6 @@ Require Import FiniteTypes Arith MyTactics MPiecewise  VNArith.
       let (v , G) := l in
          let (u , F) := r in
               (pcmp1 v u , pcmp F (ppl2n G u)).
-
-  (*  Definition PPComp1 n (l : PPCm 0) (r : PPCm n) : PPCm n. 
-      intros. destruct l; destruct r. Check pl2n_ok. *)
-
-
-
- (* Lemma test1 : forall n i,   n - i > 0 ->  n < i -> 2 = 3.
-    intros. omega. *)
-
 
     (** piecewise composition is correct *)
     Lemma PPCm_cmp_ok n (l : PPCm 0)  (r : PPCm n)  (X : Set) : 
@@ -561,64 +446,14 @@ Require Import FiniteTypes Arith MyTactics MPiecewise  VNArith.
          let (u , F) := r in
               (pcmp1 v u , pcmpm F (ppl2n G u)).
     
-
-   (* to do: correctness of composition,  equality *) 
     
-   End Representation. 
+ End Representation. 
   
 
  End TLPiecewise.
 
- (* Section TZ. *)
-
-  (* Require Import ZArith.
-
-   Inductive Lfun (n : nat)  : Set :=
-   | add :  Lfun n -> Lfun n -> Lfun n
-   | sub :  Lfun n -> Lfun n -> Lfun n
-   | vR  :  Fin n -> Lfun n
-   | cnsT : Z ->  Lfun n. 
   
-
- (* interpretation  *)
- Fixpoint Evl n (i : Lfun n) (v : Vec Z n) :  Z :=
-   match i with 
-   | cnsT n =>  n
-   | vR j =>  vecfin v j
-   | add l r => (Evl l v  + Evl r v)%Z
-   | sub l r  => (Evl l v - Evl r v)%Z
-   end.
-
- (*  | pf l cl cr =>
-      if lt_le_dec 0 (pevl n l v) then pevl n cl v else pevl n cr v *)
- Fixpoint PEvl n (i : Piecewise (Lfun n) ) v :=
-    match i with
-    | lp l => Evl l v
-    | pf c l r => if Z_lt_dec 0 (PEvl c v) then PEvl l v else PEvl r v
-    end.
-
-  Fixpoint  PEvl1 n (i : Cond (Lfun n) ) v :=
-    match i with
-    | Ret l => Evl l v
-    | Cif c l r => if Z_lt_dec 0 (Evl c v) then PEvl1 l v else PEvl1 r v
-    end.
-
-  (* now turn a function on the natural numbers to one on the integers  *)
-  Fixpoint l2Lfun n (i : lfun n) : Lfun n :=
-    match i with
-   | adD l r => add (l2Lfun l) (l2Lfun r)  
-   | suB l r => sub (l2Lfun l) (l2Lfun r)
-   | vr  i => vR i 
-   | cnst a => cnsT _ (Z_of_nat a)  
-   end.
-
-  Fixpoint p2Pfun n (i : Piecewise (lfun n)) : Piecewise (Lfun n) :=
-   match i with
-   | lp l => lp (l2Lfun l)
-   | pf c l r => pf (p2Pfun c) (p2Pfun  l) (p2Pfun r)
-   end. *)
-  
-  Section Normalizing.
+ Section Normalizing.
      (** Euqality for linear functions  *)
      
      (* push a number into a vector at positions determined by Fin n *)
@@ -635,7 +470,6 @@ Require Import FiniteTypes Arith MyTactics MPiecewise  VNArith.
     | vr j => push 0 j 1
     | adD l r => vAdd (alps l) (alps r) 
     | suB l r => vSub (alps l) (alps r)
-  (* | nmul z l => vmap (fun a => z * a) (alps l) *)
    end.
  
    (* beta is just a constant *)
@@ -645,7 +479,6 @@ Require Import FiniteTypes Arith MyTactics MPiecewise  VNArith.
    | vr _   => 0
    | adD l r => (bet l + bet r)
    | suB l r => (bet l - bet r)
-  (* | nmul z l => z * bet l *)
    end.
 
    Definition norm n (i : lfun n) := (alps i , bet i). 
@@ -654,36 +487,11 @@ Require Import FiniteTypes Arith MyTactics MPiecewise  VNArith.
    Definition lfunEq n (i j : lfun n) :=  
      if (vecEqDec eq_nat_dec (alps i) (alps j)) then (if eq_nat_dec (bet i) (bet j) then true else false) else false.  
 
-(*
-  
-    (* evaluation at a vector of zeros gives bet *)
- (* Lemma eval0 n (i : lfun n): evl i (vec n 0%Z) = bet i.
-    induction i; simpl; auto with arith. 
-    induction f; auto.  (*rewrite IHi; trivial. *)
-  Qed. *)
-
-  
-
- (* this belongs to VArith *-)
- Lemma ZSs_Vtms (n : nat ) (v i0 i : Vec nat n) :
-   ZSumz (Vtimes (vSub v i0) i) = ZSumz (Vtimes v i) - ZSumz (Vtimes i0 i).
- Proof.
-    induction v; intros; vSimp; simpl; trivial. rewrite (IHv i0 i). ring.
-  Qed. *)
- 
-
-(* We can prove they are equal by turning them into integers *)
- *)
  End Normalizing.
 
-  (* Change a PCm into integers *)
-  (* Definition pcm2Z n (i : PCm n) := (l2Lfun (fst i) , p2Pfun (snd i) ).  *)  
-    
-
-(*  End TZ. *)
 
 Section Equality. 
- (*  *)
+
    Definition vlst n (v : Vec nat n) :=
       match v with
       | vnil  => 0
@@ -725,35 +533,8 @@ Section Equality.
   Qed.
 
 
-   (* equality *)
-  (*  Definition pCmEQ n (i j : PCm n)  := pcmEQ1 (pcM2m (pcm_nrm i)) (pcM2m ( pcm_nrm j)). *)
-  
-
-   (* piecewise *-)
-     Definition ppcm_nrm n (i : PPCm n) : PPCM n :=
-      let (l , r) := i in (pnorm  l , pnorm  r).
-
-   Definition ppCmEQ n (i j : PPCm n)  := ppcmEQ (ppcm_nrm i) (ppcm_nrm j). *)
-   
-
   End Equality. 
- (* Lemma minus_gt_0Z : forall n m, (0 < n - m)%Z -> (m < n)%Z. 
-   intros; omega. 
-  Qed. *)
-
- (* 
- let H  := constr:(n_minus_le _ _ H) in
-            let H1 := constr:(one_minus_nm _ _ Hyp) in
-              let H0 := constr:(one_minus_nm_minus_1 _ _ Hyp) in
-                let h0 := fresh "h0" in
-                  let h1 := fresh "h1" in
-                    let h := fresh "h" in
-                         set (h := H) ; set (h0 := H1); set (h1 := H0) 
- *) 
- (*
-    Lemma testx : forall n m, 0 < n - m -> True.
-      intros. optimiseOmega. 
-    Qed. *)
+ 
 
 (** * Experiements with arithmetic representation *)
 
@@ -776,12 +557,6 @@ Section Equality.
   Section Examples_and_Definitions.
 (** Definitions and Exmaples*)
 
-  (* testing using reverse   
-    rev1 = (f ,g) where
-          f = id
-         g : \lambda n i. if i < n then n - i - 1 else 0
- *)
-
   (** reverse *)
   Definition Rev1 :  Plfun 1 *  Plfun 2  :=
    (  lp (vr (fz _ )) ,  
@@ -796,15 +571,6 @@ Section Equality.
 
   Definition Idf :  Plfun 1 *  Plfun 2  := (   lp (vr (fz _ )) , lp (Id1 2)).
   
- (* Definition lm_cmp (l r : lfun 1 * lfun 2) := 
-    let (v, G) := l in let (u, F) := r in (cmp' v u, cmp F (pl2n G u)). *)
-
- (* Definition nrm n (i : lfun n) := norm (lfun2Lf i). *) 
-
-
-  (*    Lemma nminus_minus1 : forall a b, 0 < b -> a < b - (b - 1) -> a < 1. *-)
-      | [H : 0 < ?b , H1 : ?a < ?b - (?b - 1) |- _ ] =>
-           let K := constr:(nminus_minus1 H H1) in   generalize H; clear H; clear H1; intros *)
   
   (** rev is involutive  *)
   Lemma rev_rev_idm  :  pcmEQ (PPComp Rev1 Rev1) Idf.
@@ -880,24 +646,9 @@ Section Equality.
    containers. 
  Qed.
 
- (*
 
- compare:
-   append: (lp (adD (vr (fz _ )) (vr (fs (fz _)))) , 
-          (pf (lp (suB (vr (fz _)) (vr (tp _)))) (lp (vr (tp 2))) (lp (suB (vr (fz _)) (vr (tp 2))))) 
-     ).
-  
-
- take m = (f ,g) where
-      f n = if n < m them m else n
-      g n i =>  if i < m then m else i
-
-
-
-
-   *) 
   (** Take               *)
-  Definition take1 m : PPCm 0 :=
+ Definition take1 m : PPCm 0 :=
     ( pf (lp (suB (cnst _ m) (vr (fz _)))) (lp (cnst _ m)) (lp (vr (fz 0)))  ,
        (pf (lp (suB (cnst _ m) (vr (tp 1)))) (lp (cnst _ m)) (lp (vr (tp 1))))
     ).
@@ -984,43 +735,5 @@ Section Equality.
    containers.
  Qed.
    
-(*
- Section General_rot_unrot.
- (** *generalised unrotate nad rotate  *)   
- (* Definition unrotn n : PPCm 0 :=
-    (lp (Id1 1) ,
-     pf (lp (suB (vr (tp _)) (suB (cnst _ n) (cnst _ 1)))) 
-         (lp (suB (vr (tp _)) (cnst _ n)))  (lp (suB (vr (fz _)) (cnst _ n)))
-    ). *)
-
-  Fixpoint unrotn n : PPCm 0 :=
-    match n with
-    | O => Idf
-    | S m => PPComp unrot1 (unrotn m)
-    end.
-
-  Fixpoint rotn n : PPCm 0 := 
-     match n with
-     | O => Idf
-     | S m => PPComp rot1 (rotn m)
-     end.
-   (*   ( lp (Id1 1)  ,
-     pf (lp (suB (suB (vr (fz _))  (cnst _ n)) (vr (tp _)))) 
-         (lp (adD (vr (tp _)) (cnst _ n)))
-        (* (lp (suB (vr (tp _)) (suB (vr (fz _))  (cnst _ 1)))) *)
-          (lp (suB (cnst _ n) (cnst _ 1))) 
-    ). *)
-
-(**
- We can show this lemma is true:
-   Lemma rotn_unrotn : pcmEQ (PPComp (rotn 2) (unrotn 2))  Idf. *)
- (*  - Proof.
-    - simpl.  containers.
-   - Qed. >>
-*)
-
- End General_rot_unrot. *)
-
 End Examples_and_Definitions.
 
-  (* now to add some definitions and confirm the tactic *)
