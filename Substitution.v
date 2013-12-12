@@ -1,4 +1,3 @@
-
 Require Import InductiveFiniteSets.
 Require Export JMeq.
 
@@ -79,6 +78,3 @@ Section SigT.
  Defined.
 
 End SigT.
-
-
-
