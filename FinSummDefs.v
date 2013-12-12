@@ -1,4 +1,3 @@
-
 Require Import Arith Substitution JMeq Containers.
 Require Export FiniteTypes.
 
@@ -91,6 +90,7 @@ Qed.
  rewrite (trans_equal R
     (plus_comm (sum_n (fun i => F (fs (emb i)))) (F (fs (tp n))))); trivial.
 Qed.
+
   
 Fixpoint finj' (n : nat) (i : Fin n)  :  
        forall f : Fin n -> nat,  Fin (f i) -> Fin (sum_n f) :=
@@ -107,7 +107,6 @@ Fixpoint finj' (n : nat) (i : Fin n)  :
 Inductive FinSumm (n : nat) (f : Fin n -> nat) : Fin (sum_n f) -> Set :=
   finPair : forall (i: Fin n) (k : Fin (f i)), FinSumm f (finj f i k).
 
-
  Fixpoint finSumm n : forall (f: Fin n -> nat) (x : Fin (sum_n f)),  FinSumm f x :=
   match n as e return (forall (f: Fin e -> nat) (x : Fin (sum_n f)),  FinSumm f x) with
   | O => fun f x => nofin (FinSumm f x) x
@@ -123,7 +122,6 @@ Inductive FinSumm (n : nat) (f : Fin n -> nat) : Fin (sum_n f) -> Set :=
   end. 
 
 (** * Results *)
-
 Lemma finjF (n : nat) (i : Fin n) (f : Fin n -> nat) 
      (f1 f2 : Fin (f i)) : finj f i f1 = finj f i f2 -> f1 = f2.
 Proof.
