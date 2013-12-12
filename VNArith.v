@@ -26,13 +26,6 @@ Require Export Vectors.
                                end
     end. 
 
-  (* Fixpoint vmul (n : nat) (i : Vec Z n) : Vec Z n -> Vec Z n :=
-     match i in Vec _ e return (Vec Z e -> Vec Z e) with
-    | vnil => fun _ => vnil _
-    | vcons _ x xs => fun j => match vCons j with 
-                               | isvcons y ys => vcons (x * y) (vmul xs ys)
-                               end
-    end. *)
 
     (* compute the evaluation matrix *)
    Fixpoint Vtimes (n : nat) (l : Vec nat n)  : Vec nat n -> Vec nat n :=
@@ -166,7 +159,6 @@ Require Export Vectors.
   Proof. 
     induction v; intros; vSimp; simpl; trivial.  rewrite (IHv v0 i j0); ring.
   Qed.
-
   
   Lemma vtimes_vcons_vsnoc n (xs : Vec nat n) (ys : Vec nat (S n)) x :
       ZSumz (Vtimes (vSnoc x xs) ys) = ZSumz (Vtimes xs (vfirst ys)) + x * (vlast ys).
@@ -191,12 +183,6 @@ Require Export Vectors.
      intro H;  rewrite H; ring.
    Qed.
 
-  (* this belong in the vectors file *-)
-   Lemma vVsnoc n (X : Set) (v : Vec X (S n)) : v = vSnoc (vlast v) (vfirst v).
-   Proof.
-     intros; vSimp. generalize a; unfold vlast; unfold vfirst; vsimpl; clear.
-    induction i ; simpl; trivial. intros; rewrite (IHi x); trivial.
-  Qed.*)
   
  End Addition_subtraction_multiplication.
 
