@@ -106,23 +106,17 @@ Definition list_to_ext  X (l: list X) : Ext Lst X :=
   Inductive LDom : Set :=
    | one : LDom
    | prd : LDom -> LDom -> LDom.
-  (* | smm : LDom -> LDom -> LDom *)
-  (* | cmp : LDom -> LDom -> LDom. *)
 
   Fixpoint IDom ld (X : Type) :=
    match ld with
    | one => list X
    | prd l r => prod (IDom l X) (IDom r X)
-  (* | smm l r => sum (IDom l X) (IDom r X) *)
-  (* | cmp l r => IDom l (IDom r X) *)
    end.
  
   Fixpoint domCont l :=
     match l with
     | one => Lst
     | prd l r => cont_prod (domCont l) (domCont r)
-   (* | smm l r => cont_sum (domCont l) (domCont r) *)
-   (* | cmp l r => cComp (domCont l) (domCont r) *)
     end.
 
 
@@ -142,13 +136,6 @@ Definition list_to_ext  X (l: list X) : Ext Lst X :=
     | prd l r =>  fun a => let ex :=  extP a in
                      (IDomL2eX _ (fst ex) , IDomL2eX _ (snd ex) )
    end.
-
- (*
- Definition lfun2morP (h : forall X, list X * list X -> list X):= 
-    let H := fun X (l : Ext Lst X * Ext Lst X) => 
-         list_to_ext  ( h _ (ext_to_list (fst l), ext_to_list (snd l))) in
-      ext_mor (fun _ Ec => (H _ (extP Ec))).
- *)
 
  (* turning an arbitrary poltmorphic function, with nary domain, into its corresponding 
     container morphism *)
@@ -198,17 +185,13 @@ Section Container_Morphisms.
  Definition crev :  Lst ===> Lst := 
   uCmr Lst Lst (id (s Lst))  (fun nn: s Lst => fun Fn: p Lst nn => rv Fn).
 
- (*Definition hd_ss n : unit + nat := match n with
-                       | S _ => inr  _ 1
-                       | _   => inl  _ tt
-                      end. *)
   Definition hd_ss n : nat :=
      match n with 
      | O => O
      | S _ => 1
      end.
 
- (* a bette waw to write teh shape map*)
+ (* a better wa to write teh shape map*)
   Lemma hds_ok_aux : forall n, 0 < n -> 1 = n - (n - 1).
     intros; omega.
   Qed.
@@ -217,9 +200,6 @@ Section Container_Morphisms.
     intros. destruct (lt_eq_lt_dec n 0). destruct s; subst; simpl; trivial. destruct (lt_n_O _ l).
     rewrite <- (hds_ok_aux l). destruct n; simpl; trivial. inversion l. 
   Qed.
-
- (* *)
-  
 
  Definition hd_pos n :  Fin (n - (n - 1)) -> Fin n :=
     match n as e return Fin (e - (e - 1)) -> Fin e with
@@ -244,7 +224,6 @@ Section Container_Morphisms.
   
  
 (* Tail *)
-                                
   Definition tail_s n :  nat :=
    match n   with
    | O => 0
@@ -265,7 +244,6 @@ Section Container_Morphisms.
 (* Tail *)      
 Definition ctail :=  uCmr Lst Lst (fun n => n - 1)  tail_p.    
     
-
 Definition not_last (n:nat) : Fin (n - 1) ->  Fin n :=
    match n as n0 return (Fin  (n0 - 1) -> Fin n0) with
    | 0 =>   nofin (Fin 0) 
@@ -308,7 +286,6 @@ Definition not_last (n:nat) : Fin (n - 1) ->  Fin n :=
 
    Definition rotm n (i j : Fin n) := rotm_aux i j. 
 
-  (* Eval compute in (rotm (n := 4)  (fs (fs (fs (fz _))))  (fs (fs (fs (fz _))))). *)
 
    (* position map for rotate m *)
    Definition rotmP m n (i : Fin n) : Fin n :=
@@ -336,7 +313,7 @@ Definition not_last (n:nat) : Fin (n - 1) ->  Fin n :=
     Definition takep n m : Fin (if le_lt_dec n m then n else m) -> Fin n :=
        match le_lt_dec n m as  a return  Fin (if a then n else  m) -> Fin n with
        | left _ => fun i => i 
-        | right l => fun i => nat_finite _ l (* takeP m _ i *)
+        | right l => fun i => nat_finite _ l 
        end.
     Definition ctake m := uCmr Lst Lst (fun n => ts n m) (fun n => takep n m). 
 
@@ -398,7 +375,7 @@ Definition cappendr : cmr ((Lst <x> Lst) <x> Lst) Lst.
   destruct (finsplit n0 n1 l) as [i | j].
   exact (inl _  (inl _  i)). (*Fin n* Fin n0*  *)
   exact (inl _ (inr _ j)). (*Fin n* (Fin n0) *)
-  exact (inr _ r).  (*Fin n0 + Fin n1*)
+  exact (inr _ r). 
 Defined. 
 
  (* Composiitons of lists indexted bu n *)
@@ -422,53 +399,9 @@ Definition map_rev :=
             fun ps : CPos Lst a  => cpos Lst a (cs ps) (rv (cp ps))) in
           uCmr (cComp Lst Lst) (cComp Lst Lst) (id (Ext Lst nat))  pmap.
 
-
-(* Check (m_comp cflatt (ap_mor cflatt Lst)).
-
- Definition test1 :   Ext Lst (Ext Lst nat)  -> Ext Lst nat.
-  intro a; destruct a. 
-  induction u.
-  exact  (cnil nat).
-  exact  (IHu (fun i => f (fs i))).
-Defined. 
-
-Check (uCmr (cComp Lst (cComp Lst Lst)) (cComp Lst Lst) test1).
-
-Definition test2 : forall a : Ext Lst (Ext Lst nat),
-               CPos Lst (test1 a) -> CPos (cComp Lst Lst) a.
- intros a ca.
- destruct ca.
- simpl in *.
- inversion  a.
- Check  (cpos (cComp Lst Lst) a  ). *)
-
-
-(*Fixpoint leN (n m:nat) {struct n}: bool :=
-    match n with
-   | O => true 
-   | S n' => match m with
-                  | O => false 
-                  | S m' => leN n' m'
-                  end
-   end. *)
-
-(*Record pairFin (n: nat) : Set := prfin {pa: Fin n  ;  pb : Fin n}.
-Definition zLst := ucont (fun n => pairFin n ). 
-Definition zLst1 := ucont (fun n => (Fin n * Fin n)%type).  *)
 Definition min (n m : nat) : nat := if le_lt_dec n m  then n else m.        
          
-(* Definition zip_pos (pn: (nat * nat) ) (i: pairFin  (min (fst pn) (snd pn) )) :  Fin (fst pn) + Fin (snd pn) .
-   intros pn ;  destruct pn  as [n1 n2]; simpl. unfold min.
-  (* unfold min; destruct n1; destruct n2; simpl.
-   intro i; destruct i. inversion pa0.
-   intro i; destruct i. inversion pb0.
-   intro i; destruct i.  inversion pa0. *)
-  destruct (le_lt_dec n1 n2); simpl.
-  intro i; exact (inl _ (pa i)). (*Fin (S n2)*)
-  intro i;exact (inr  _ (pb i)). (*Fin (S n1)*)
-Defined. *)
-
-  Definition zip_pos  n m := 
+Definition zip_pos  n m := 
     let s := le_lt_dec n m in
        if s as s0 return (Fin (if s0 then n else m) -> Fin n + Fin m)
            then fun i : Fin n => inl (Fin m) i
@@ -502,19 +435,11 @@ Definition zrev : cmr (Lst <x> Lst) (Lst <x> Lst) := let pmap :=
             end) in 
             uCmr (Lst <x> Lst) (Lst <x> Lst) (id (s (Lst <x> Lst)))  pmap.   
  
-(* zip rev 2 *)
-(* Definition czip_revr := 
-    let cziprv_pmap := (fun  a : nat * nat => fun  i : p zLst (v czip a)  => zip_pos
- a (prfin (rv (pa i)) (rv (pb i)))) in 
-            uCmr (Lst <x> Lst) zLst  (v czip) (fun a : nat * nat =>
-                         fun Pcz : p zLst (v czip a) => cziprv_pmap a Pcz). *)
-
 
 End Container_Morphisms.  
                                     
 Section Container_Proofs. 
  (** * Container Proofs *)
-(* Reverse is idempotent *)
 Theorem crev_crev_id :  (m_comp crev crev) ==== (idm Lst).
  Proof.  
    simpl; unfold idm; unfold comp.
@@ -522,16 +447,6 @@ Theorem crev_crev_id :  (m_comp crev crev) ==== (idm Lst).
    intro a; apply (refl_equal a). 
    intros a p0 p1 H;  elim  H; apply idem_rvFin.
 Qed.
-
- (* take drop *-)
- Lemma take_drop m : (m_comp cappend (mor_prod (ctake m) (cdrop m))) ====  (m_comp cappend (mor_prod (idm Lst) (idm Lst))).
- Proof.
-   intro m;  simpl; unfold idm; unfold comp.
-   apply morq;  simpl. unfold id; trivial. 
-   destruct a; simpl. unfold ts.
-   destruct (le_lt_dec n m). 
-
-  *)  
 
  (* head after rev is last *)
  Theorem crev_chead_clast :  (m_comp cHead crev) ==== clast.
@@ -558,14 +473,6 @@ Qed.
       destruct a; simpl in *; FSimpl
   end.
  Qed.
-
-  (*  rev . take m  = drop m . rev  *
-  Theorem crev_take_drop m :  (m_comp crev (ctake m)) ==== (m_comp (cdrop m) crev).
-     intros;  apply morq; unfold comp; simpl; unfold id; trivial. 
-     unfold comp.  induction a; simpl; intros; FSimpl.   
-     destruct m; simpl; FSimpl. destruct a; simpl in *; FSimpl.
-  *)
-   
 
 
  Lemma cpos_nrv ( a : Ext Lst nat)
@@ -602,7 +509,7 @@ Proof.
  Proof.
    apply morq; simpl; trivial; unfold comp; unfold id.
    intros a p0 p1 H; elim H; trivial.
- Qed. ( * --- still to automate  *)
+ Qed. 
                            
  (* Distributuvty of append over reverse *)
 
@@ -634,7 +541,6 @@ Proof.
    apply  (finsumX (refl_equal (rv p1)) (finsplit n0 n p0) (finsplit n n0 (rv p1)) jm).
    (* reflexivity. *)
  Qed.
-
 
 Theorem cdist_aprev : 
   (m_comp cappend  (m_comp (mor_prod crev crev) (prod_swap Lst Lst))) ====
@@ -687,13 +593,7 @@ Proof.
  case (fin_inr_inject (n0 + n1) j j0 (JMeq_eq H)); trivial.
 Qed.
  
-Section  Naturality_Laws. (* --- have to automate these *) 
-(* Naturality laws  over morphisms.                              *)
-(* The following functions  have the same trivial proof :        *)
-(*      -- f . head = head . map f                               *) 
-(*      -- map f . tail  = tail  . map f                         *) 
-(*      -- map f . reverse =  reverse . map f                    *) 
-(*      -- map f . flatten = flatten . map (map f)               *) 
+Section  Naturality_Laws.
 
   Variables X Y : Set.
   Variable  F : X -> Y.
@@ -720,14 +620,7 @@ Section  Naturality_Laws. (* --- have to automate these *)
     destruct ex; auto.
   Qed.
 
-  (* Theorem cmap_flatt (ex : Ext Lcomp X) :
-     cmap F (mmap cflatt ex) = mor_map cflatt F ex.
-  Proof.
-    destruct ex; auto.
-  Qed. *)
-
-
-  Theorem cmap_append (ex : Ext (cont_prod Lst Lst) X):
+ Theorem cmap_append (ex : Ext (cont_prod Lst Lst) X):
       (mor_map cappend F ex) =  (cmap F (mmap cappend ex)).
   Proof.
     destruct ex; auto. 
@@ -743,26 +636,7 @@ Proof.
  apply morq; simpl.
  apply (fun a : Ext Lst nat => sum_n_rv (f a)). 
  intros a  p0 p1 H; unfold cflatt_p; simpl.
- (*
-   working automates proofs
-    repeat (
-  match goal with
-  | [ |- context [finSumm ?F ?i] ] =>
-         match i with
-         | rv _ => fail 1
-         | _    => destruct (finSumm _ i); simpl
-         end
-    
-  | [ H : JMeq (finj ?x _ _) ?p |- _ ] =>
-        match goal with
-        | [ |- context [finSumm _ (rv p)] ] => 
-           let Eq := constr:(finSumm_push_rv  _ _ _ H) in
-              progress (unfold Lst) ; rewrite Eq || rewrite <- Eq 
-        end
- 
-   end); auto. *)
- (*cut (sum_n (f a) = sum_n (fun a0 : Fin (u a) => f a (rv a0))). *)
- (* intros H1;*) unfold cflatt_p; simpl.
+ unfold cflatt_p; simpl.
  destruct a; simpl in *.
  destruct (finSumm (fun a => f (rv a)) p0); simpl. 
  apply  (rv_elim3 p1 (fun _ => fun b => cpos Lst (uext Lst u f) (rv i) (rv k) =
@@ -770,7 +644,7 @@ Proof.
                                         | finPair j k0 => cpos Lst (uext Lst u f) j k0
                                         end ) ). 
  intros j H0; rewrite (rvdist p1 (sym_equal H0)) in H.
- destruct (finSumm f j); simpl.  (*(sum_n_rv f).*)
+ destruct (finSumm f j); simpl. 
  destruct  (finjLem f i0 k0 i k (rvdistJM (sym_eq (sum_n_rv f)) (finj f i0 k0) (sym_JMeq H))).
  apply cpos_eq; auto.
 Qed.
@@ -790,7 +664,7 @@ Qed.
 Theorem crev_flat : 
     (m_comp cflatt (m_comp (ap_mor crev Lst) map_rev)) ====
     (m_comp cflatt  (m_comp map_rev (ap_mor crev Lst))) .
-    apply morq; simpl; unfold comp; unfold id; trivial. (*simpl f. *)
+    apply morq; simpl; unfold comp; unfold id; trivial. 
     unfold cflatt_p; simpl. intros a p0 p1 H; elim H. reflexivity. 
 Qed.
    
@@ -808,9 +682,7 @@ Qed.
        Ext C X * Ext D X.
    intros C D X ex; destruct ex; simpl in *. destruct u; simpl in *.
    exact (uext C s (fun a => f (inl (p D s0) a)) ,  uext D s0 (fun a => f (inr (p C s) a))).
- Defined. Print extP2.
-
-(* Check test2 : cComp (cont_prod Lst Lst) Lst -> cont_prod (cComp Lst Lst) (cComp Lst Lst). *)
+ Defined. 
 
  Definition cComp_prd_iso (a : cmr (cComp (cont_prod Lst Lst) Lst) (cComp Lst Lst)) :
                cmr (cont_prod (cComp Lst Lst) (cComp Lst Lst)) (cComp Lst Lst).
@@ -846,14 +718,6 @@ Proof.
   destruct (finsplit (u e) (u e0) a); trivial.
 Qed.
 
- (*Check FinCase_inl_rwt. *)
-
- (*Require Import MyTactics. * )
- Check (ap_mor cappend Lst).
- Check cflatt.
- Check  (m_comp cappend (mor_prod cflatt cflatt)).
- Check  cComp_prd_iso. *)
-
 (* flatten append is equal as container morphism  *)
 Theorem cdist_apflatt :
    (m_comp cflatt (cComp_prd_iso (ap_mor cappend Lst))) ==== 
@@ -865,17 +729,11 @@ Theorem cdist_apflatt :
        |[ a : ?X * ?Y |- _] =>  destruct a; simpl in *
        end); unfold comp in *; simpl in *; 
      try apply  (sum_nm (f e) (f e0))) in hhh. 
-   (*  destruct e; destruct e0; simpl in *. *)
-   
-   (*(*rewrite <- (sym_eq (sum_n_sim a)). *)
-   simpl; unfold comp.   destruct a; simpl; unfold comp; simpl .
-   intros  p0 P1 H. *)
     match goal with
     | [ |- context [cflatt_p]] => unfold cflatt_p; simpl in *
     end;  
    repeat 
       (match goal with 
-         (* | [ |- context [Lst]] => unfold id *) 
           | [ P1 : Fin (?m + ?n ) |- _ ] =>
                     destruct ( finsplit _ _  P1) ; simpl in *
           | [ |- context [finSumm ?f ?a ] ] => 
@@ -886,8 +744,6 @@ Theorem cdist_apflatt :
            | [ |- context [FinCase ?X _ (fin_inr ?X ?i) ]] => 
                 let Eq := constr:(FinCase_inr X i) in
                       rewrite Eq
-
-     (* these are working *)
 
     | [ H : JMeq (finj  _ (fin_inr _ ?b) _ ) (fin_inl (sum_n _ ) (finj _ _ _ )) |- _ ] =>
                    let dterm := constr:(finjInr_Inl_false _ _ _ _ _ _ H) in
@@ -922,23 +778,11 @@ Theorem cdist_apflatt :
       
 
            end); auto. 
-    (* rewrite (FinCase_inl_rwt _ _ _ _ _ _ H ).  trivial.
-     case (finjInr_Inl_false _ _ _ _ _ _ H ).
-     case  (finjInl_Inr_false _ _ _ _ _ _ H). unfold Lst.
-     rewrite (FinCase_inr_rwt _ _ _ _ _ _ H); trivial. *)
     Qed.
    
 
 End Container_Proofs.
 (** * Automatic Proofs *)
-  (*Ltac sum_n_rewriter F :=
-      match goal with
-      | [ a : Ext (ucont Fin) nat |-  _ ] =>
-               let G := constr:(f a) in 
-                  let Eq := constr:(sum_nm F G) in 
-                     let Eq1 := constr:(sum_nm G F) in
-                    rewrite Eq || rewrite <- Eq || rewrite Eq1 || rewrite  <- Eq1
-              *)
 
   Ltac finSumn_rewrite :=
     match goal with
@@ -946,13 +790,6 @@ End Container_Proofs.
          let F := constr:(f x) in
             let Eq := constr:(sum_n_rv F) in 
                    rewrite Eq || rewrite <- Eq
-   (* | x : Ext _ nat, y : Ext _ nat |- _  =>
-          let F := constr:(f x) in 
-               let G := constr:(f y) in
-                 let Eq := constr:(sum_nm F G) in rewrite Eq; trivial *)
-    (*| [ x :  Ext _ _ *  Ext _ _ |- _ ] =>  destruct x as [e1 e2]; simpl in *;
-          let F := constr:(f x) with G := constr:(f e2) in
-              sum_n_rewriter F G*)
     end.
    
   
@@ -964,14 +801,8 @@ End Container_Proofs.
                      | nat => first [auto with arith | omega ]
                      end
      | [ x : _ * _ |- _ ] => destruct x; simpl fst in *; simpl snd in * 
-                                      (* sum_n_rewriter F *)
       end.
 
- (* Ltac destrt :=
-  match goal with  
-   | x :  _ * _ |- _  =>  destruct x as [e1 e2];  simpl in *
-  end. *)
- 
 
  Tactic Notation "contInitialise" "with" constr(h) := repeat (contInit h). 
 
@@ -983,7 +814,6 @@ End Container_Proofs.
  Section Automatic_Proofs.
  (**  Auotomatic proofs of previous results *)
 
- (* Require Import MyTactics. *)
 
  Ltac container_tac := 
    let ctac :=
@@ -1036,17 +866,17 @@ Qed.
   Theorem cdist_aprev2 : 
    (m_comp crev cappd) ==== (m_comp cappd (m_comp (mor_prod crev crev)  (prod_swap Lst Lst))). 
   Proof.
-     Time container_tac. (*Finished transaction in 0. secs (0.065722u,0.00072s) *)
+     Time container_tac. 
   Qed.
 
  Lemma capp_assoc1 :  (m_comp cappendl (prod_swap1 Lst Lst Lst)) ==== cappendr.
   Proof.
-    Time container_tac. (*Finished transaction in 0. secs (0.209269u,0.000969s) *)
+    Time container_tac. 
  Qed.
 
  Lemma capp_assoc2 :  cappendr ==== (m_comp cappendl (prod_swap1 Lst Lst Lst)).
   Proof.
-   Time container_tac. (* Finished transaction in 0. secs (0.227911u,0.001911s) *)
+   Time container_tac. 
  Qed.
 
  (* examples with flatten *)
@@ -1054,7 +884,7 @@ Qed.
     (m_comp cflatt (m_comp (ap_mor crev Lst) map_rev)) ====
     (m_comp cflatt  (m_comp map_rev (ap_mor crev Lst))) .
   Proof.
-    Time container_tac. (*Finished transaction in 0. secs (0.191168u,0.003013s) *)
+    Time container_tac. 
  Qed.
 
  
@@ -1062,33 +892,33 @@ Qed.
     (m_comp cflatt  (m_comp map_rev (ap_mor crev Lst))) ====
     (m_comp cflatt (m_comp (ap_mor crev Lst) map_rev)).
   Proof.
-   Time container_tac. (*Finished transaction in 0. secs (0.19615u,0.000724s) *)
+   Time container_tac. 
  Qed.
 
  Theorem map_flatt_rev1:
     (m_comp cflatt (m_comp  map_rev (ap_mor crev Lst))) ==== (m_comp crev cflatt).
  Proof.
-   Time container_tac. (* Finished transaction in 0. secs (0.125499u,0.000713s) *) 
+   Time container_tac. 
  Qed.
 
   Theorem map_flatt_rev2:
      (m_comp crev cflatt) ==== (m_comp cflatt (m_comp  map_rev (ap_mor crev Lst))).
  Proof.
-   Time container_tac. (* Finished transaction in 0. secs (0.124305u,0.000614s) *)
+   Time container_tac. 
  Qed. 
 
  Theorem cdist_apflatt1 :
    (m_comp cflatt (cComp_prd_iso (ap_mor cappend Lst))) ====
     (m_comp cappend (mor_prod cflatt cflatt)).
  Proof. 
-   Time container_tac. (*Finished transaction in 1. secs (1.006353u,0.005844s) *)
+   Time container_tac. 
  Qed.
 
  Theorem cdist_apflatt2 :
     (m_comp cappend (mor_prod cflatt cflatt)) ====
       (m_comp cflatt (cComp_prd_iso (ap_mor cappend Lst))).
  Proof. 
-   Time container_tac. (*Finished transaction in 1. secs (0.998819u,0.005174s) *)
+   Time container_tac. 
  Qed.
   
 
@@ -1155,7 +985,7 @@ End  Ucontainers_lists.
     exact (inr _  i).
   Defined.
 
-   Definition crevSuc1 : ((One_cont <x> Un_cont) <x> Lst) ===> Lst.
+  Definition crevSuc1 : ((One_cont <x> Un_cont) <x> Lst) ===> Lst.
     refine (uCmr ((One_cont <x> Un_cont) <x> Lst) Lst
        (fun x => (snd x) + 1) _ ); simpl.
     destruct a; simpl.  
@@ -1163,7 +993,6 @@ End  Ucontainers_lists.
     exact (inr _  i).
     exact (inl _ (inr _ tt)).
   Defined.
-
 
   Definition cappSuc : ((Lst <x> Un_cont) <x> Lst) ===> Lst.
     refine (uCmr ((Lst <x> Un_cont) <x> Lst) Lst
@@ -1184,14 +1013,9 @@ End  Ucontainers_lists.
    induction a; simpl; auto.
   Qed.
 
-
  Lemma finEmtp_tp : forall n, finEmtp (tp n) = isTp n.
    induction n; simpl; auto. rewrite IHn. trivial.
  Qed.
-
- (* Lemma finSN_fz : forall n, finSN (fz n) = isfz n. simpl.
-   induction n; simpl; auto. rewrite IHn. trivial.
- Qed. *)
 
  Lemma finEmtp_em : forall n (i : Fin n), finEmtp (emb i) = isEmb i.
    induction i; simpl; auto.
@@ -1207,7 +1031,6 @@ End  Ucontainers_lists.
    forall (X A B : Set) (f : A -> X) (g : B -> X),
       JMeq f g ->  (forall (a : A) (b : B), JMeq a b -> f a = g b).
   
-
  Lemma rv_tp : forall n, rv (tp n) = fz n.
   induction n; simpl ; auto.
   rewrite IHn; simpl. trivial.
@@ -1264,13 +1087,6 @@ Qed.
       (feq_app isId a0) (isRv a0) a2 ); trivial.
  Qed.
 
-  (* reverse is indeed given by crevZero and crevSuc1 *
- Lemma isRev1 : Eqmor (oneTimes (cGenfold crevZero crevSuc1)) crev.
-  repeat (contInitialize); try (rewrite isId; trivial). 
-   rewrite  (dext_swp (C := Empty + Fin a0)  Fin 
-      (feq_app isId a0) (isRv a0) a2 ); trivial.
- Qed. *)
-
  Lemma fld_add : forall n m,
      fld (fun a : nat => a)
      (fun x : nat * unit * nat => (snd x) + 1)  n m =
@@ -1281,7 +1097,6 @@ Qed.
   rewrite <- (plus_assoc n m 1 );  rewrite <- (plus_Snm_nSm m 0);
   auto with arith.
  Qed. 
-
 
  Lemma Jmeq_fs (n m : nat) (i :Fin n) (j : Fin m) :
      n = m -> JMeq i j -> JMeq (fs i) (fs j).
@@ -1299,83 +1114,3 @@ Qed.
    rewrite plus_0_r; auto. 
   Qed.
  
- (*
-  Lemma isApp (n m : nat) :
-   JMeq ( fldp (fun a0 : nat => a0) (fun x : nat * unit * nat => snd x + 1) Fin Fin
-     (fun (z : nat) (x : Fin z) => x)
-     (fun (c : nat) (_ : unit) (a0 : nat) (i : Fin (a0 + 1)) =>
-      match finsplit a0 1 i with
-      | is_inl i0 => inr (Fin c + unit) i0
-      | is_inr _ => inl (Fin a0) (inr (Fin c) tt)
-      end) n m) (FinCase n m).
-  Proof. 
-    intros.  apply (dextensionality (C := Fin n + Fin m) Fin
-     (fld_add n m) ). intros; FSimpl. 
-   (* unfold FinCase. 
-    destruct (finsplit _ _ y); simpl in *. *)
-    induction m; simpl in *; FSimpl.
-    rewrite (JMeq_eq (trans_JMeq H (fin_inl_O i)));  trivial.
-    simpl in x. destruct (finsplit _ _ x); simpl.
-    rewrite finsplit_inl. 
-    Check (trans_JMeq H (fin_inl_Sm m i)).
-    rewrite (IHm i0 (fin_inlJm 1 (fld_add n m) i0 (fin_inl m i) 
-            (trans_JMeq H (fin_inl_Sm m i)))); trivial.
-    rewrite finsplit_inr.
-    Check (sym_JMeq (trans_JMeq H (fin_inl_Sm m i))).
-    
-
-
-    Check (fin_inl_inrZ1 ).  
-  Check  (trans_eq (trans_eq (sym_eq (plus_Snm_nSm n m))
-           (sym_equal (f_equal S (fld_add n m))))
-      (S1 (fld (fun a : nat => a) (fun x : nat * unit * nat => snd x + 1) n
-              m))). _ _   H ).
-
-
-    Lemma fin_inl_jinject : forall n m (i : Fin n),
-      JMeq (fin_inl (S m) i) (fin_inl 1 (fin_inl m i)).
-  
-    Check (IHm i0 ). 
-    simpl. 
-    assert (forall n m, n = m -> JMeq (fz n) (fz m)).
-    intros a b h; destruct h; auto.
-    Check (fld_add (S n) m).
-    set (r := trans_JMeq (sym_JMeq (H0 _ _ (fld_add  n m))) H). 
-    Check (fz (n + m)).
-    Check (trans_JMeq r (JM_rvEmb1 m i)).
-    destruct i; simpl in *. *-)
-
-
- Lemma isAppend : Eqmor (cGenfold (idm Lst) cappSuc) cappend . 
-   contInitialize. apply (fld_add (fst a0) (snd a0)).
-    destruct a0; simpl in *.
-    apply (dext_swp (C := Fin n + Fin n0) Fin
-       (fld_add n n0) ); trivial. 
-    unfold FinCase. induction n0; simpl.
-    destruct (finsplit _ _ y). simpl in x.
-    rewrite (JMeq_eq (trans_JMeq H (fin_inl_O i))); trivial.
-    inversion j. simpl in x. destruct (finSN x); simpl.
-    destruct (finsplit _ _ y).
- 
-    Check ( fldp (fun a0 : nat => a0) (fun x : nat * unit * nat => S (snd x)) Fin Fin
-     (fun (z : nat) (x : Fin z) => x)
-     (fun (c : nat) (_ : unit) (a0 : nat) (i : Fin (S a0)) =>
-      match finSN i with
-      | isfz => inl (Fin a0) (inr (Fin c) tt)
-      | isfs i0 => inr (Fin c + unit) i0
-      end) n n0).
-
- Lemma isApp (n m : nat) :
-   JMeq (fldp (fun a0 : nat => a0) (fun x : nat * unit * nat => S (snd x)) Fin Fin
-     (fun (z : nat) (x : Fin z) => x)
-     (fun (c : nat) (_ : unit) (a0 : nat) (i : Fin (S a0)) =>
-      match finSN i with
-      | isfz => inl (Fin a0) (inr (Fin c) tt)
-      | isfs i0 => inr (Fin c + unit) i0
-      end) n n0) (FinCase (n := n) (m := m)). 
-
-
-  *)
-  
-
-
