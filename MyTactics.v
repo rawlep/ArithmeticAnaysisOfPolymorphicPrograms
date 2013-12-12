@@ -290,8 +290,6 @@ Require Import Arith FinSummDefs  Omega JMeq ZArith Ring Containers.
     (* no do the same for integers  *)
      end.
 
-
-
 (** 
 ------
  end of arithemetic conversion and simplification 
