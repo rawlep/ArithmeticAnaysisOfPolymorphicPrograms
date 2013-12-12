@@ -1,4 +1,3 @@
-
 Require Import Arith JMeq FiniteTypes Substitution.
 Require Import Containers Max Eqdep. 
 
@@ -129,7 +128,6 @@ Some properties of vrev, vSnoc, vfirst and vlast *)
    rewrite (vrevSnoc x (vrev v)); rewrite IHv; trivial.
  Qed.
 
- (* *)
  Lemma vlast_vcons : forall  n (x : X) (v : Vec (S n)), vlast (vcons x v) = vlast v. 
  Proof.
    intros. destruct (vCons v); unfold vlast; unfold vhead; unfold vtail; simpl; trivial.
@@ -168,7 +166,6 @@ Some properties of vrev, vSnoc, vfirst and vlast *)
    end.
 
   
-
   (** Non-standard eliminator for  View (n + m) *)
   Inductive vPlusView (n m : nat) : Vec (n + m) -> Type :=
    | vplus : forall (i : Vec n) (j : Vec m), vPlusView n m (vPlus i j).
@@ -199,13 +196,10 @@ Some properties of vrev, vSnoc, vfirst and vlast *)
     match i in Vec e return  Vec (e * m) with
     | vnil =>  vnil
     | vcons _ _ i1 =>  vPlus j (vTimes  i1 j)
-    end.     (* *)            
-
-
+    end.              
   
 Inductive VecTimes (n m : nat)  : Vec (n * m) -> Type :=
   |isVecPair : forall (i : Vec n) (j : Vec m) , VecTimes n m (vTimes i j).
-
 
  Definition vectimes ( n m : nat)  : forall i : Vec (n * m), VecTimes n m i.
     cut (forall m  (i : Vec 0), VecTimes 0 m i). intro.
@@ -350,35 +344,8 @@ Inductive VecTimes (n m : nat)  : Vec (n * m) -> Type :=
     intros until v2. intro H; destruct H. 
     destruct (vCons v1); simpl. auto.
   Qed.
- 
- (* Fixpoint pow_fun (n:nat) (B :Type){struct n}: Type := 
-  match n with
-  0 => B
-  | (S n) => X -> pow_fun n B
-  end.
-
-Implicit Arguments pow_fun [ ].
- Fixpoint pow_fun_map (n:nat)(B C: Type){struct n}:
-  (B->C) -> pow_fun n B -> pow_fun n C :=
- match n return (B->C) -> pow_fun n B -> pow_fun n C with
-  O => fun f => f
- | (S n) => fun f => fun pf => 
-            fun a => pow_fun_map n f (pf a)
- end.
-
-Fixpoint vector_make (n:nat){struct n}: pow_fun n (Vec n) :=
- match n return pow_fun n (Vec n) with
-  0 => vnil
-  | (S n) => fun a:X => pow_fun_map n 
-                        (fun v => vcons a v)
-                        (vector_make n)
-end. *)
 
 End Vectors.
-
-
-
-
 
   Fixpoint vmap (n : nat)  (A B : Set) (f : A -> B) (i : Vec A n) {struct i} :
      Vec B n :=
@@ -414,9 +381,7 @@ End Vectors.
 
 
 Section VecFin.
-(** 
- Vectors and Finite Sets 
- *) 
+(** Vectors and Finite Sets *) 
  Fixpoint vecfin (A : Type) (n : nat) (i : Vec A n) {struct i} :  Fin n -> A :=
    match i in (Vec _ e) return (Fin e -> A) with
    | vnil  => fun x =>  match (fin_0_empty x) return A with end
@@ -432,9 +397,8 @@ Section VecFin.
   | S n'  => fun f => vcons (f (fz n')) (finVec (fun i => f (fs i)))
   end.
 
-  
 
-(* This isomorphism extends to dependent sums : \Sigma n : nat. Fin n -> X *)
+(* Isomorphism extends to dependent sums : \Sigma n : nat. Fin n -> X *)
 (* Here we use the extension of a container for lists *)
  Definition extVec (i : Ext (ucont Fin) nat) : Vec nat (u i) := finVec (f i).
 
@@ -461,7 +425,6 @@ Section VecFin.
    intros A n i j H; set (r := f_equal (vecfin (A := A) (n := n)) H); simpl in r.
    rewrite (vecFinVec i) in r; rewrite (vecFinVec j) in r; trivial.
  Qed.
-
 
  Lemma vecJmeq X (n m : nat) (h : n = m)  (F : Fin n -> X) (G : Fin m -> X) : JMeq (finVec F) (finVec G) -> JMeq F G.
   intros X n m h; destruct h. intros F G h.
@@ -518,9 +481,7 @@ Section VecFin.
    unfold vlast; unfold vhead; unfold vtail; simpl; trivial.
   Qed.
 
-                 
 End VecFin.
-
 
 Section Tuples.
 
@@ -545,7 +506,6 @@ Section Tuples.
     | vcons _ x xs => (x, (vec2tup xs))
    end.
   
-
  Fixpoint tuple_proj (n:nat){struct n}: forall k:nat, k<n -> Tuple n -> A :=
   match n return (forall k:nat, k<n -> Tuple n -> A) with
   O => fun (k:nat)(h:k<O)(v:Tuple 0) =>
@@ -619,13 +579,3 @@ End Function_Tuples.
                             end
        end. 
    Ltac vSimp := repeat vecRwt; repeat vSimp_aux.
-
-
- (* Lemma test : forall n  (i : Vec nat (S n)) (j : Vec bool 0)
-    (k : Vec unit (n + n)) ,  nat.
-   intros n i j k; vSimp. exact 0. 
- Qed. *)
- 
-
-
-                    
